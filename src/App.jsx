@@ -16,7 +16,7 @@ const EVENT = {
     mapUrl: 'https://maps.google.com/?q=Quinta+Carolina+Valle+de+los+Chillos',
   },
   rsvpDeadline: '5 de enero de 2027',
-  rsvpUrl: 'https://form.jotform.com/263288138857674',
+  rsvpUrl: 'https://form.jotform.com/thonyyepez97/confirmacion--xv-mara-emilia',
   message:
     'Hay momentos que se esperan con ilusión y personas con quienes se quieren compartir. Gracias por ser parte de mi historia; tu presencia hará este día aún más especial.',
 }
