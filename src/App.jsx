@@ -283,7 +283,7 @@ export default function App() {
             <Message />
           </Reveal>
           <Reveal variant="fade" delay={400}>
-            <p className="footer-note">Te esperamos ✦ {EVENT.name}</p>
+            <p className="footer-note">✦ Te esperamos ✦</p>
           </Reveal>
         </section>
       </article>
