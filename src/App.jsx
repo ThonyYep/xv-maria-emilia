@@ -16,14 +16,15 @@ const EVENT = {
     mapUrl: 'https://maps.google.com/?q=Quinta+Carolina+Valle+de+los+Chillos',
   },
   rsvpDeadline: '5 de enero de 2027',
-  // Reemplaza con el número real (formato internacional, sin +)
-  rsvpWhatsApp: '593000000000',
+  rsvpUrl: 'https://form.jotform.com/263288138857674',
   message:
     'Hay momentos que se esperan con ilusión y personas con quienes se quieren compartir. Gracias por ser parte de mi historia; tu presencia hará este día aún más especial.',
 }
 
+const INTRO_DELAY = 1000 // ms antes de que se dibuje la primera pantalla
+
 /* ───────────── Reveal on scroll ───────────── */
-function Reveal({ children, delay = 0, variant = 'up', as: Tag = 'div', className = '' }) {
+function Reveal({ children, delay = 0, variant = 'up', className = '' }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
 
@@ -38,27 +39,27 @@ function Reveal({ children, delay = 0, variant = 'up', as: Tag = 'div', classNam
           io.disconnect()
         }
       },
-      { threshold: 0.18, rootMargin: '0px 0px -8% 0px' }
+      { threshold: 0.25 }
     )
     io.observe(el)
     return () => io.disconnect()
   }, [])
 
   return (
-    <Tag
+    <div
       ref={ref}
       className={`reveal reveal--${variant} ${visible ? 'is-visible' : ''} ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
-    </Tag>
+    </div>
   )
 }
 
 /* ───────────── Ornamentos ───────────── */
-function Sparkle({ size = 18, filled = false, className = '', style }) {
+function Sparkle({ size = 18, filled = false, className = '' }) {
   return (
-    <svg className={`sparkle ${className}`} style={style} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+    <svg className={`sparkle ${className}`} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <path
         d="M12 1.5c.6 5.4 2.4 8.4 9.5 10.5-7.1 2.1-8.9 5.1-9.5 10.5-.6-5.4-2.4-8.4-9.5-10.5C9.6 9.9 11.4 6.9 12 1.5z"
         fill={filled ? 'currentColor' : 'none'}
@@ -70,13 +71,24 @@ function Sparkle({ size = 18, filled = false, className = '', style }) {
   )
 }
 
-function Divider({ filled = false, wide = false }) {
+function Divider({ filled = false }) {
   return (
-    <div className={`divider ${wide ? 'divider--wide' : ''}`} aria-hidden="true">
+    <div className="divider" aria-hidden="true">
       <span className="divider__line" />
       <Sparkle size={filled ? 12 : 16} filled={filled} />
       <span className="divider__line" />
     </div>
+  )
+}
+
+function ScrollHint({ delay = 0, light = false }) {
+  return (
+    <Reveal variant="fade" delay={delay} className={`scroll-hint ${light ? 'scroll-hint--light' : ''}`}>
+      <span>Desliza</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </Reveal>
   )
 }
 
@@ -158,7 +170,7 @@ function Countdown() {
   return (
     <div className="countdown" role="timer" aria-label="Tiempo restante para la celebración">
       {Object.entries(t).map(([label, value], i) => (
-        <Reveal key={label} delay={i * 90} variant="zoom" className="countdown__cell">
+        <Reveal key={label} delay={500 + i * 120} variant="zoom" className="countdown__cell">
           <span className="countdown__num">{String(value).padStart(2, '0')}</span>
           <span className="countdown__label">{label}</span>
         </Reveal>
@@ -187,51 +199,48 @@ function Message() {
 
 /* ───────────── App ───────────── */
 export default function App() {
-  const rsvpText = encodeURIComponent(`¡Hola! Confirmo mi asistencia a los XV años de ${EVENT.name}.`)
+  const d = INTRO_DELAY
 
   return (
     <main className="page">
       <article className="card">
         <div className="card__frame" aria-hidden="true" />
 
-        {/* HERO */}
-        <section className="hero">
-          <Reveal variant="fade"><Divider /></Reveal>
-          <Reveal delay={150}>
+        {/* 1 · NOMBRE */}
+        <section className="screen hero">
+          <Reveal variant="fade" delay={d}><Divider /></Reveal>
+          <Reveal delay={d + 250}>
             <p className="intro">
               Con gran alegría, nuestra familia se une para celebrar los XV años de nuestra hija,
             </p>
           </Reveal>
-          <Reveal delay={300} variant="fade">
+          <Reveal delay={d + 600} variant="fade">
             <p className="kicker">
               Mis <span className="accent-gold">XV años</span>
             </p>
           </Reveal>
-          <Reveal delay={450} variant="zoom">
+          <Reveal delay={d + 900} variant="draw">
             <h1 className="name">{EVENT.name}</h1>
           </Reveal>
-          <Reveal delay={600} variant="fade"><Divider filled /></Reveal>
+          <Reveal delay={d + 1900} variant="fade"><Divider filled /></Reveal>
           <Sparkle className="deco d1" size={20} />
           <Sparkle className="deco d2" size={16} filled />
+          <ScrollHint delay={d + 2600} />
         </section>
 
-        {/* FECHA */}
-        <section className="date-block">
-          <Reveal>
-            <p className="eyebrow">Save the date</p>
-          </Reveal>
-          <Reveal delay={120}>
-            <p className="date">{EVENT.dateLabel}</p>
-          </Reveal>
-          <Reveal delay={220} variant="zoom">
-            <span className="time-pill">{EVENT.timeLabel}</span>
-          </Reveal>
+        {/* 2 · FECHA */}
+        <section className="screen screen--dark date-block">
+          <Reveal variant="fade"><p className="eyebrow">Save the date</p></Reveal>
+          <Reveal delay={150}><p className="date">{EVENT.dateLabel}</p></Reveal>
+          <Reveal delay={350} variant="zoom"><span className="time-pill">{EVENT.timeLabel}</span></Reveal>
           <Countdown />
+          <ScrollHint delay={1400} light />
         </section>
 
-        {/* EVENTOS */}
-        <section className="events">
-          <Reveal variant="left" className="event">
+        {/* 3 · LUGARES */}
+        <section className="screen events">
+          <Reveal variant="fade"><p className="eyebrow eyebrow--gold">Dónde celebraremos</p></Reveal>
+          <Reveal variant="left" delay={150} className="event">
             <span className="event__icon" aria-hidden="true"><ChurchIcon /></span>
             <h2 className="event__title">Ceremonia religiosa</h2>
             <p className="event__place">{EVENT.ceremony.place}</p>
@@ -240,10 +249,7 @@ export default function App() {
               Ver ubicación
             </a>
           </Reveal>
-
-          <Reveal variant="fade"><span className="events__sep" aria-hidden="true" /></Reveal>
-
-          <Reveal variant="right" className="event">
+          <Reveal variant="right" delay={400} className="event">
             <span className="event__icon" aria-hidden="true"><GlassIcon /></span>
             <h2 className="event__title">Recepción</h2>
             <p className="event__place">{EVENT.reception.place}</p>
@@ -253,35 +259,33 @@ export default function App() {
           </Reveal>
         </section>
 
-        {/* EMBLEMA */}
-        <Reveal variant="zoom" className="emblem-wrap">
-          <Emblem />
-        </Reveal>
+        {/* 4 · EMBLEMA */}
+        <section className="screen emblem-screen">
+          <Reveal variant="zoom"><Emblem /></Reveal>
+          <Reveal delay={500}>
+            <p className="tagline">Un día para recordar</p>
+          </Reveal>
+        </section>
 
-        {/* RSVP */}
-        <Reveal className="rsvp">
-          <h2 className="rsvp__title">Confirma tu asistencia</h2>
-          <p className="rsvp__deadline">
-            Hasta el <strong>{EVENT.rsvpDeadline}</strong>
-          </p>
-          <a
-            className="cta"
-            href={`https://wa.me/${EVENT.rsvpWhatsApp}?text=${rsvpText}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Confirmar por WhatsApp
-          </a>
-        </Reveal>
-
-        {/* MENSAJE */}
-        <Reveal delay={100}>
-          <Message />
-        </Reveal>
-
-        <Reveal variant="fade">
-          <p className="footer-note">Te esperamos ✦ {EVENT.name}</p>
-        </Reveal>
+        {/* 5 · CONFIRMACIÓN */}
+        <section className="screen rsvp-screen">
+          <Reveal className="rsvp">
+            <h2 className="rsvp__title">Confirma tu asistencia</h2>
+            <p className="rsvp__deadline">
+              Hasta el <strong>{EVENT.rsvpDeadline}</strong>
+            </p>
+            <p className="rsvp__note">Cada invitación incluye 1 pase personal.</p>
+            <a className="cta" href={EVENT.rsvpUrl} target="_blank" rel="noreferrer">
+              Confirmar asistencia
+            </a>
+          </Reveal>
+          <Reveal delay={250}>
+            <Message />
+          </Reveal>
+          <Reveal variant="fade" delay={400}>
+            <p className="footer-note">Te esperamos ✦ {EVENT.name}</p>
+          </Reveal>
+        </section>
       </article>
     </main>
   )
